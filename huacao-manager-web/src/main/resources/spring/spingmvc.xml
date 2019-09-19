@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+	<!-- 配置注解驱动 -->
+	<mvc:annotation-driven />
+	<!-- 加载图片服务器属性文件 -->
+	<context:property-placeholder location="classpath:fastdfs/resource.properties"/>
+	<!-- 视图解析器 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	<!-- 配置包扫描器，扫描@Controller注解的类 -->
+	<context:component-scan base-package="cn.qst.controller"/>
+	<!-- 配置资源映射 -->
+	<mvc:resources location="/css/" mapping="/css/**"/>
+	<mvc:resources location="/js/" mapping="/js/**"/>
+	<!-- 定义文件上传解析器 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	    <!-- 设定默认编码 -->
+	    <property name="defaultEncoding" value="UTF-8"></property>
+	    <!-- 设定文件上传的最大值为5MB，5*1024*1024 -->
+	    <property name="maxUploadSize" value="5242880"></property>
+	    <!-- 设定文件上传时写入内存的最大值，如果小于这个参数不会生成临时文件，默认为10240 -->
+	    <property name="maxInMemorySize" value="40960"></property>
+	    <!-- 延迟文件解析 -->
+	    <property name="resolveLazily" value="true"/>
+	</bean>
+	<!-- 引用dubbo服务 -->
+    <dubbo:application name="huacao-manager-web"/>
+	<dubbo:registry protocol="zookeeper" address="192.168.25.128:2181"/>	
+	<dubbo:reference interface="cn.huacao.service.ItemCatService" id="itemCatService" />
+	<dubbo:reference interface="cn.huacao.service.ItemService" id="itemService"/>
+	<dubbo:reference interface="cn.huacao.service.ItemDescService" id="itemDescService"/>
+	<dubbo:reference interface="cn.huacao.content.service.ContentCategoryService" id="contentCategoryService"/>
+	<dubbo:reference interface="cn.huacao.content.service.ContentService" id="contentService"/>
+	<dubbo:reference interface="cn.haucao.search.service.SolrItemService" id="solrItemService"/>
+	<dubbo:reference interface="cn.huacao.sso.service.UserService" id="userService"/>
+</beans>
